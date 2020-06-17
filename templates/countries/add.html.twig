@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dodaj nowy kraj{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="row mt-5">
+        <div class="col-sm-6 offset-sm-3">
+            <h1 class="h3 mb-3 font-weight-normal">Dodaj nowy kraj</h1>
+            {{ form(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
+    <script>
+        $(".select2").select2({
+            multiple: true,
+            tags: true
+        });
+        $(".select2-multiple").select2({
+            multiple: true
+        });
+    </script>
+{% endblock %}

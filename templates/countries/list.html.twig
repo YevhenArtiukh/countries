@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lista krajów{% endblock %}
+
+{% block body %}
+    <div class="row mt-5">
+        <div class="col-12">
+                <div class="text-right">
+                    <a class="btn btn-info" href="{{ path('countries_generate_xls') }}">Wyeksportuj listę krajów</a>
+                    {% if is_granted('ROLE_USER') or is_granted('ROLE_ADMIN') %}
+                        <a class="btn btn-info" href="{{ path('user_add_countries') }}">Wybierz kraje w których byłeś</a>
+                        <a class="btn btn-info" href="{{ path('country_add') }}">Dodaj nowy kraj</a>
+                    {% endif %}
+                </div>
+            <table class="table mt-4">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Nazwa</th>
+                    <th scope="col">Flaga</th>
+                    <th scope="col">Język urzędowy</th>
+                    <th scope="col">Ilość osób</th>
+                    {% if is_granted('ROLE_USER') or is_granted('ROLE_ADMIN') %}
+                        <th scope="col">Lista osób</th>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <th scope="col">Akcje</th>
+                    {% endif %}
+                </tr>
+                </thead>
+                <tbody>
+                {% for country in countries %}
+                    {% if is_granted('ROLE_ADMIN') or country.active %}
+                        <tr>
+                            <td>{{ country.name }}</td>
+                            <td>
+                                <img src="{{ asset('uploads/'~country.flag) }}" class="img-responsive" alt="Flaga" style="max-width: 100px; max-height: 100px">
+                            </td>
+                            <td>{{ country.languages|join(', ') }}</td>
+                            <td>{{ country.countUsers }}</td>
+                            {% if is_granted('ROLE_USER') or is_granted('ROLE_ADMIN') %}
+                                <td>{{ country.users }}</td>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <td>
+                                    <form method="post" action="{{ path('country_delete', {country: country.id}) }}">
+                                        {% if not country.active %}
+                                            <a class="btn btn-primary" href="{{ path('country_accept', {country: country.id}) }}">Akceptuj</a>
+                                        {% endif %}
+                                        <a class="btn btn-primary" href="{{ path('country_edit', {country: country.id}) }}">Zmień</a>
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ country.id) }}">
+                                        <button class="btn btn-danger">Usuń</button>
+                                    </form>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

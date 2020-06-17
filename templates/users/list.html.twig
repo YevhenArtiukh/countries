@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lista użytkowników{% endblock %}
+
+{% block body %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Imię</th>
+                    <th scope="col">Nazwisko</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Akcje</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.surname }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <div class="d-flex justify-content-end">
+                            <a class="btn btn-primary" href="{{ path('user_show', {user: user.id}) }}">Podgląd</a>
+                            {% if is_granted('ROLE_USER') or is_granted('ROLE_ADMIN') %}
+                                <a class="btn btn-primary ml-2" href="{{ path('user_generate_pdf', {user: user.id}) }}">pdf</a>
+                            {% endif %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a class="btn btn-primary ml-2" href="{{ path('user_edit', {user: user.id}) }}">Zmień</a>
+                                <form method="post" action="{{ path('user_delete', {user: user.id}) }}" class="ml-2">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <button class="btn btn-danger">Usuń</button>
+                                </form>
+                            {% endif %}
+                        </div>
+
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Title of the PDF</title>
+        <style type="text/css">
+            * {
+                font-family: "DejaVu Sans Mono", monospace;
+            }
+        </style>
+    </head>
+    <body>
+        <h4>Został wygenerowany pdf dla {{ user.surname~' '~user.name }}</h4>
+
+        <table>
+            <tbody>
+            <tr>
+                <td>Imię</td>
+                <td>{{ user.name }}</td>
+            </tr>
+            <tr>
+                <td>Nazwisko</td>
+                <td>{{ user.surname }}</td>
+            </tr>
+            <tr>
+                <td>E-mail</td>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <td>Wiek</td>
+                <td>{{ user.age }}</td>
+            </tr>
+            <tr>
+                <td>Ilość krajów odwiedzonych</td>
+                <td>{{ user.countries|length }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </body>
+</html>

@@ -1,0 +1,125 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+    mailer_from: 'admin@mystart.com.pl'
+    target_dir_flag: '%kernel.project_dir%/public/uploads'
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    # controllers are imported separately to make sure services can be injected
+    # as action arguments even if you don't extend any base controller class
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    doctrine_application_transaction:
+        class: App\Adapter\Core\Transaction
+        arguments:
+            - "@doctrine.orm.entity_manager"
+        public: true
+
+    App\Adapter\Core\EmailFactory:
+        arguments:
+            - "@twig"
+            - '%mailer_from%'
+        public: true
+
+    email_factory:
+        alias: App\Adapter\Core\EmailFactory
+        public: true
+
+    Users:
+        class: App\Adapter\Users\Users
+        arguments:
+            - "@doctrine.orm.default_entity_manager"
+        public: true
+
+    Countries:
+        class: App\Adapter\Countries\Countries
+        arguments:
+            - "@doctrine.orm.default_entity_manager"
+        public: true
+
+    Languages:
+        class: App\Adapter\Languages\Languages
+        arguments:
+            - "@doctrine.orm.default_entity_manager"
+        public: true
+
+    App\Entity\Users\UseCase\CreateUser:
+        arguments:
+            - "@Users"
+            - "@create_user.generate_email"
+            - "@doctrine_application_transaction"
+
+    App\Entity\Users\UseCase\EditUser:
+        arguments:
+            - "@doctrine_application_transaction"
+
+    App\Entity\Users\UseCase\ConfirmedUser:
+        arguments:
+            - "@Users"
+            - "@doctrine_application_transaction"
+
+    App\Entity\Users\UseCase\AddCountriesUser:
+        arguments:
+            - "@Users"
+            - "@doctrine_application_transaction"
+
+    App\Entity\Users\UseCase\DeleteUser:
+        arguments:
+            - "@Users"
+            - "@doctrine_application_transaction"
+
+    App\Entity\Countries\UseCase\CreateCountry:
+        arguments:
+            - "@Countries"
+            - "@Languages"
+            - "%target_dir_flag%"
+            - "@doctrine_application_transaction"
+
+    App\Entity\Countries\UseCase\EditCountry:
+        arguments:
+            - "@Countries"
+            - "@Languages"
+            - "%target_dir_flag%"
+            - "@doctrine_application_transaction"
+
+    App\Entity\Countries\UseCase\AcceptCountry:
+        arguments:
+            - "@doctrine_application_transaction"
+
+    App\Entity\Countries\UseCase\DeleteCountry:
+        arguments:
+            - "@Countries"
+            - "@doctrine_application_transaction"
+
+    App\Entity\Languages\UseCase\EditLanguage:
+        arguments:
+            - "@Languages"
+            - "@doctrine_application_transaction"
+
+    create_user.generate_email:
+        class: App\Entity\Users\UseCase\CreateUser\GenerateEmail
+        arguments:
+            - "@mailer"
+            - "@logger"
+            - "@email_factory"
+            - "@router"
+        public: true

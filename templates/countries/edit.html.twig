@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Zmiana kraju{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/select2.min.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="row mt-5">
+        <div class="col-sm-6 offset-sm-3">
+            <h1 class="h3 mb-3 font-weight-normal">Zmiana kraju</h1>
+            <div class="text-center">
+                <img src="{{ asset('uploads/'~app.request.get('country').flag) }}" class="img-responsive" alt="Flaga" style="max-width: 100px; max-height: 100px">
+            </div>
+            {{ form(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/select2.full.min.js') }}"></script>
+    <script>
+        {% for language in form.vars.value.languages %}
+            $('option[value="{{ language.name }}"]').attr('selected','selected');
+        {% endfor %}
+        $(".select2").select2({
+            // multiple: true,
+            tags: true
+        });
+    </script>
+{% endblock %}
