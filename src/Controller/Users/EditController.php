@@ -69,7 +69,8 @@ class EditController extends AbstractController implements Responder
             'name' => $user->getName(),
             'surname' => $user->getSurname(),
             'age' => $user->getAge(),
-            'email' => $user->getEmail()
+            'email' => $user->getEmail(),
+            'role' => $user->getRole()
         ];
     }
 
